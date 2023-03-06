@@ -6,16 +6,14 @@
  */
 
 import React from 'react';
-import {FlatList, SectionList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 let users = [
   {
     name: 'anshu',
-    data: ['bca', 'mca'],
   },
   {
     name: 'sharma',
-    data: ['bba', 'ccca'],
   },
 ];
 const App = () => {
@@ -23,17 +21,19 @@ const App = () => {
     <View>
       <FlatList
         data={users}
-        renderItem={({item}) => (
-          <View>
-            <Text style={styles.text}>{item.name}</Text>
-          </View>
-        )}
+        renderItem={({item}) => <Text style={styles.text}>{item.name}</Text>}
       />
-      <SectionList
-        sections={users}
-        renderItem={({item}) => <Text>{item}</Text>}
-        renderSectionHeader={({section: {name}}) => <Text>{name} </Text>}
-      />
+      <ScrollView>
+        <View style={styles.grid}>
+          {[...Array(100)].map((_, index) => {
+            return (
+              <Text key={index} style={styles.div}>
+                {index}
+              </Text>
+            );
+          })}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   text: {
     color: 'red',
     margin: 10,
-    fontSize: 30,
+    fontSize: 40,
   },
   div: {
     textAlign: 'center',

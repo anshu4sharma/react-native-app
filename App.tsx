@@ -1,74 +1,34 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import {
-  Button,
-  FlatList,
-  SectionList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Text, View} from 'react-native';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {NavigationContainer} from '@react-navigation/native';
 
-let users = [
-  {
-    name: 'anshu',
-    data: ['bca', 'mca'],
-  },
-  {
-    name: 'sharma',
-    data: ['bba', 'ccca'],
-  },
-];
-const App = () => {
+const Tab = createMaterialTopTabNavigator();
+const HomeScreen = () => {
   return (
     <View>
-      <FlatList
-        data={users}
-        renderItem={({item}) => (
-          <View>
-            <Text style={styles.text}>{item.name}</Text>
-          </View>
-        )}
-      />
-      <SectionList
-        sections={users}
-        renderItem={({item}) => <Text>{item}</Text>}
-        renderSectionHeader={({section: {name}}) => (
-          <Text>{name} : anmshu </Text>
-        )}
-      />
-      <Button title="pressme" />
+      <Text>HomeScreen asd</Text>
     </View>
   );
 };
 
-export default App;
+const SettingsScreen = () => {
+  return (
+    <View>
+      <Text>SettingsScreen asd</Text>
+    </View>
+  );
+};
 
-const styles = StyleSheet.create({
-  text: {
-    color: 'red',
-    margin: 10,
-    fontSize: 30,
-  },
-  div: {
-    textAlign: 'center',
-    borderColor: 'red',
-    borderWidth: 1,
-    height: 100,
-    width: 100,
-    textAlignVertical: 'center',
-    margin: 2,
-    // padding: 4,
-  },
-  grid: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    flex: 1,
-  },
-});
+function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+export default App;

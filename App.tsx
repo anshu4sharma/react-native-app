@@ -6,7 +6,14 @@
  */
 
 import React from 'react';
-import {FlatList, SectionList, StyleSheet, Text, View} from 'react-native';
+import {
+  Button,
+  FlatList,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 let users = [
   {
@@ -32,8 +39,11 @@ const App = () => {
       <SectionList
         sections={users}
         renderItem={({item}) => <Text>{item}</Text>}
-        renderSectionHeader={({section: {name}}) => <Text>{name} </Text>}
+        renderSectionHeader={({section: {name}}) => (
+          <Text>{name} : anmshu </Text>
+        )}
       />
+      <Button title="pressme" />
     </View>
   );
 };

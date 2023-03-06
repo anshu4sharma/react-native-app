@@ -5,38 +5,30 @@
  * @format
  */
 
-import React, {useState} from 'react';
-import {
-  Button,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React from 'react';
+import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 
+let users = [
+  {
+    name: 'anshu',
+  },
+  {
+    name: 'sharma',
+  },
+];
 const App = () => {
-  const [text, setText] = useState('');
   return (
-    <ScrollView>
-      <View>
-        <Text>{text}</Text>
-        <TextInput
-          style={styles.text}
-          value={text}
-          onChangeText={v => setText(v)}
-          placeholder="fuclk sd as da sd"
-        />
-        <TextInput
-          style={styles.text}
-          value={text}
-          onChangeText={v => setText(v)}
-          placeholder="fuclk sd as da sd"
-          secureTextEntry
-        />
-        <Button title="clea all" onPress={() => setText('')} />
-      </View>
-    </ScrollView>
+    <View>
+      <FlatList
+        data={users}
+        renderItem={({item}) => <Text style={styles.text}>{item.name}</Text>}
+      />
+      <ScrollView style={styles.div}>
+        {[...Array(100)].map((_, index) => {
+          return <Text>{index}</Text>;
+        })}
+      </ScrollView>
+    </View>
   );
 };
 
@@ -46,5 +38,11 @@ const styles = StyleSheet.create({
   text: {
     color: 'red',
     margin: 10,
+    fontSize: 40,
+  },
+  div: {
+    display: 'flex',
+    gap: 10,
+    textAlign: 'center',
   },
 });

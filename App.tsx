@@ -1,201 +1,127 @@
+// How to Access Call Logs of Android Devices from React Native App
+// https://aboutreact.com/access-call-logs-of-android-devices/
+
+// import React in our code
+import React, {useState, useEffect} from 'react';
+
+// import all the components we are going to use
 import {
-  View,
+  SafeAreaView,
+  Platform,
+  StyleSheet,
   Text,
+  View,
+  PermissionsAndroid,
   FlatList,
-  TouchableHighlight,
-  StatusBar,
-  TextInput,
-  Button,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {PermissionsAndroid} from 'react-native';
-import WifiManager from 'react-native-wifi-reborn';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Modal from 'react-native-modal';
-interface WifiNetwork {
-  BSSID: string;
-  SSID: string;
-  capabilities: string;
-  frequency: number;
-  level: number;
-  timestamp: number;
-}
+
+// import CallLogs API
+import CallLogs from 'react-native-call-log';
+
 const App = () => {
-  const [wifiList, setWifiList] = useState<WifiNetwork[]>([]);
-  const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
-  const [selectedSSID, setSelectedSSID] = useState('');
-  const [password, setPassword] = useState('');
+  const [listData, setListDate] = useState([]);
+
   useEffect(() => {
-    requestLocationermission();
-    // getCurrentWifiSSID();
-    const interval = setInterval(() => {
-      getAvailableWifiNetworks();
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
+    async function fetchData() {
+      if (Platform.OS != 'ios') {
+        try {
+          //Ask for runtime permission
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+            {
+              title: 'Call Log Example',
+              message: 'Access your call logs',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            CallLogs.loadAll().then(c => setListDate(c));
+            CallLogs.load(3).then(c => console.log(c));
+          } else {
+            console.log('Call Log permission denied');
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        console.log('Sorry! You can’t get call logs in iOS devices');
+      }
+    }
+    fetchData();
   }, []);
 
-  const getAvailableWifiNetworks = () => {
-    WifiManager.loadWifiList()
-      .then(wifiList => {
-        setWifiList(wifiList);
-        console.log('Available WiFi networks:', wifiList);
-      })
-      .catch(() => {
-        console.log('Error loading WiFi networks!');
-      });
-  };
-  const getCurrentWifiSSID = () => {
-    WifiManager.getCurrentSignalStrength().then(res => {
-      console.log('res', res);
-    });
-    WifiManager.getFrequency().then(res => {
-      console.log('frequency', res);
-    });
-
-    WifiManager.getIP().then(res => {
-      console.log('Ip', res);
-    });
-
-    WifiManager.getCurrentWifiSSID()
-      .then(ssid => {
-        console.log('Your current connected wifi SSID is ' + ssid);
-      })
-      .catch(() => {
-        console.log('Cannot get current SSID!');
-      });
-  };
-
-  const requestLocationermission = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location permission is required for WiFi connections',
-        message:
-          'This app needs location permission as this is required ' +
-          'to scan for WiFi networks.',
-        buttonNegative: 'DENY',
-        buttonPositive: 'ALLOW',
-      },
+  const ItemView = ({item}) => {
+    return (
+      // FlatList Item
+      <View>
+        <Text style={styles.textStyle}>
+          Name : {item.name ? item.name : 'NA'}
+          {'\n'}
+          DateTime : {item.dateTime}
+          {'\n'}
+          Duration : {item.duration}
+          {'\n'}
+          PhoneNumber : {item.phoneNumber}
+          {'\n'}
+          RawType : {item.rawType}
+          {'\n'}
+          Timestamp : {item.timestamp}
+          {'\n'}
+          Type : {item.type}
+        </Text>
+      </View>
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('You can use the location');
-      // You can now use react-native-wifi-reborn
-    } else {
-      console.log('Location permission denied');
-      // Permission denied
-    }
   };
 
-  const connectToWifiDevice = (ssid: string) => {
-    setPasswordModalVisible(true);
-    setSelectedSSID(ssid);
-
-  };
-  const checkPasswordRequired = (capabilities: string) => {
-    if (capabilities.includes('[WEP]') || capabilities.includes('[WPA-')) {
-      return true; // Password is required
-    }
-    return false; // No password required
+  const ItemSeparatorView = () => {
+    return (
+      // FlatList Item Separator
+      <View
+        style={{
+          height: 0.5,
+          width: '100%',
+          backgroundColor: '#C8C8C8',
+        }}
+      />
+    );
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: '#242B2E',
-        height: '100%',
-        width: '100%',
-      }}>
-      <StatusBar
-        showHideTransition={'fade'}
-        animated
-        backgroundColor="#242B2E"
-        barStyle="light-content"
-      />
-      <FlatList
-        data={wifiList}
-        keyExtractor={item => item.SSID}
-        renderItem={({item}) => (
-          <TouchableHighlight
-            key={item.SSID}
-            style={{
-              backgroundColor: '#242B2E',
-              borderRadius: 10,
-              padding: 20,
-              margin: 10,
-              borderWidth: 1,
-              borderColor: 'white',
-            }}
-            onPress={() => connectToWifiDevice(item.SSID)}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                justifyContent: 'space-between',
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  gap: 10,
-                }}>
-                <MaterialIcons
-                  name={
-                    checkPasswordRequired(item.capabilities)
-                      ? 'wifi-lock'
-                      : 'network-wifi'
-                  }
-                  size={16}
-                  color={'white'}
-                />
-                <Text
-                  style={{
-                    color: 'white',
-                  }}>
-                  Connect to {item.SSID}
-                </Text>
-              </View>
-              <Text
-                style={{
-                  color: 'white',
-                }}>
-                {item.level}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        )}
-      />
-      <Modal onBackdropPress={()=>setPasswordModalVisible(false)} isVisible={isPasswordModalVisible}>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: 'white',
-            padding: 20,
-            borderRadius: 10,
-          }}>
-          <Text
-            style={{
-              color: 'white',
-            }}>
-            Enter Password for {selectedSSID}
-          </Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            placeholderTextColor="white"
-            style={{
-              color: 'white',
-              borderBottomWidth: 0.5,
-              borderColor: 'white',
-            }}
-            autoFocus
-          />
-        </View>
-      </Modal>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View>
+        <Text style={styles.titleText}>
+          How to Access Call Logs of Android Devices from React Native App
+        </Text>
+        <FlatList
+          data={listData}
+          //data defined in constructor
+          ItemSeparatorComponent={ItemSeparatorView}
+          //Item Separator View
+          renderItem={ItemView}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 10,
+  },
+  titleText: {
+    fontSize: 22,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  textStyle: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+});

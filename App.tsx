@@ -1,52 +1,41 @@
-import * as React from 'react';
-import {Text, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Text, Animated, FlatList} from 'react-native';
+import React, {useEffect} from 'react';
 
-function HomeScreen() {
+const App = () => {
+  const opacityValue = new Animated.Value(0);
+  useEffect(() => {
+    Animated.timing(opacityValue, {
+      toValue: 1,
+      duration: 1000, // Animation duration in milliseconds
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text className="text-red-600">Home!</Text>
-    </View>
+    <FlatList
+      data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]}
+      renderItem={({item}) => (
+        <Animated.View
+          style={{
+            backgroundColor: 'red',
+            borderRadius: 10,
+            marginVertical: 4,
+            padding: 10,
+            marginHorizontal: 10,
+            opacity: opacityValue,
+          }}>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 20,
+            }}>
+            {item} Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Quisquam
+          </Text>
+        </Animated.View>
+      )}
+    />
   );
-}
+};
 
-function SettingsScreen() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
-
-const Tab = createBottomTabNavigator();
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({route}) => ({
-          // eslint-disable-next-line react/no-unstable-nested-components
-          tabBarIcon: ({focused, color, size}) => {
-            let iconName: string;
-            if (route.name === 'Home') {
-              iconName = focused
-                ? 'ios-information-circle'
-                : 'ios-information-circle-outline';
-            } else if (route.name === 'Settings') {
-              iconName = focused ? 'ios-list' : 'ios-list-outline';
-            }
-            // @ts-ignore
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: 'tomato',
-          tabBarInactiveTintColor: 'gray',
-          headerShown: false,
-        })}>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
-}
+export default App;

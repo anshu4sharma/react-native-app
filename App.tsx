@@ -10,7 +10,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import {PermissionsAndroid} from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const App = () => {
   const [wifiList, setWifiList] = useState([]);
 
@@ -84,6 +84,12 @@ const App = () => {
         console.log('Connection failed to WiFi device:', ssid);
       });
   };
+  const checkPasswordRequired = capabilities => {
+    if (capabilities.includes('[WEP]') || capabilities.includes('[WPA-')) {
+      return true; // Password is required
+    }
+    return false; // No password required
+  };
 
   return (
     <View
@@ -92,7 +98,12 @@ const App = () => {
         height: '100%',
         width: '100%',
       }}>
-      <StatusBar showHideTransition={"fade"} animated backgroundColor="#242B2E" barStyle="light-content" />
+      <StatusBar
+        showHideTransition={'fade'}
+        animated
+        backgroundColor="#242B2E"
+        barStyle="light-content"
+      />
       <FlatList
         data={wifiList}
         renderItem={({item}) => (
@@ -105,10 +116,28 @@ const App = () => {
               margin: 10,
             }}
             onPress={() => connectToWifiDevice(item.SSID)}>
-            <Text
+            <View
               style={{
-                color: 'white',
-              }}>{`Connect to ${item.SSID}`}</Text>
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+              }}>
+              <MaterialIcons
+                name={
+                  checkPasswordRequired(item.capabilities)
+                    ? 'wifi-lock'
+                    : 'network-wifi'
+                }
+                size={16}
+                color={'white'}
+              />
+              <Text
+                style={{
+                  color: 'white',
+                }}>
+                Connect to {item.SSID}
+              </Text>
+            </View>
           </TouchableHighlight>
         )}
       />

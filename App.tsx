@@ -1,23 +1,39 @@
 import {
   View,
   Text,
-  Button,
   FlatList,
   TouchableHighlight,
-  ScrollView,
   StatusBar,
+  TextInput,
+  Button,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {PermissionsAndroid} from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Modal from 'react-native-modal';
+interface WifiNetwork {
+  BSSID: string;
+  SSID: string;
+  capabilities: string;
+  frequency: number;
+  level: number;
+  timestamp: number;
+}
 const App = () => {
-  const [wifiList, setWifiList] = useState([]);
-
+  const [wifiList, setWifiList] = useState<WifiNetwork[]>([]);
+  const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
+  const [selectedSSID, setSelectedSSID] = useState('');
+  const [password, setPassword] = useState('');
   useEffect(() => {
-    requestCameraPermission();
-    getCurrentWifiSSID();
-    getAvailableWifiNetworks();
+    requestLocationermission();
+    // getCurrentWifiSSID();
+    const interval = setInterval(() => {
+      getAvailableWifiNetworks();
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const getAvailableWifiNetworks = () => {
@@ -30,7 +46,6 @@ const App = () => {
         console.log('Error loading WiFi networks!');
       });
   };
-
   const getCurrentWifiSSID = () => {
     WifiManager.getCurrentSignalStrength().then(res => {
       console.log('res', res);
@@ -52,7 +67,7 @@ const App = () => {
       });
   };
 
-  const requestCameraPermission = async () => {
+  const requestLocationermission = async () => {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
@@ -73,18 +88,12 @@ const App = () => {
     }
   };
 
-  const connectToWifiDevice = ssid => {
-    const password = 'anshu1234';
-    const isWep = false;
-    WifiManager.connectToProtectedSSID(ssid, password, isWep, false)
-      .then(() => {
-        console.log('Connected successfully to WiFi device:', ssid);
-      })
-      .catch(() => {
-        console.log('Connection failed to WiFi device:', ssid);
-      });
+  const connectToWifiDevice = (ssid: string) => {
+    setPasswordModalVisible(true);
+    setSelectedSSID(ssid);
+
   };
-  const checkPasswordRequired = capabilities => {
+  const checkPasswordRequired = (capabilities: string) => {
     if (capabilities.includes('[WEP]') || capabilities.includes('[WPA-')) {
       return true; // Password is required
     }
@@ -106,14 +115,17 @@ const App = () => {
       />
       <FlatList
         data={wifiList}
+        keyExtractor={item => item.SSID}
         renderItem={({item}) => (
           <TouchableHighlight
             key={item.SSID}
             style={{
-              backgroundColor: '#0D0D0D',
+              backgroundColor: '#242B2E',
               borderRadius: 10,
               padding: 20,
               margin: 10,
+              borderWidth: 1,
+              borderColor: 'white',
             }}
             onPress={() => connectToWifiDevice(item.SSID)}>
             <View
@@ -121,26 +133,67 @@ const App = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 10,
+                justifyContent: 'space-between',
               }}>
-              <MaterialIcons
-                name={
-                  checkPasswordRequired(item.capabilities)
-                    ? 'wifi-lock'
-                    : 'network-wifi'
-                }
-                size={16}
-                color={'white'}
-              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: 10,
+                }}>
+                <MaterialIcons
+                  name={
+                    checkPasswordRequired(item.capabilities)
+                      ? 'wifi-lock'
+                      : 'network-wifi'
+                  }
+                  size={16}
+                  color={'white'}
+                />
+                <Text
+                  style={{
+                    color: 'white',
+                  }}>
+                  Connect to {item.SSID}
+                </Text>
+              </View>
               <Text
                 style={{
                   color: 'white',
                 }}>
-                Connect to {item.SSID}
+                {item.level}
               </Text>
             </View>
           </TouchableHighlight>
         )}
       />
+      <Modal onBackdropPress={()=>setPasswordModalVisible(false)} isVisible={isPasswordModalVisible}>
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: 'white',
+            padding: 20,
+            borderRadius: 10,
+          }}>
+          <Text
+            style={{
+              color: 'white',
+            }}>
+            Enter Password for {selectedSSID}
+          </Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            placeholderTextColor="white"
+            style={{
+              color: 'white',
+              borderBottomWidth: 0.5,
+              borderColor: 'white',
+            }}
+            autoFocus
+          />
+        </View>
+      </Modal>
     </View>
   );
 };

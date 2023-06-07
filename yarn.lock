@@ -6418,6 +6418,11 @@ react-native-vector-icons@^9.2.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
+react-native-wifi-p2p@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/react-native-wifi-p2p/-/react-native-wifi-p2p-3.4.1.tgz"
+  integrity sha512-zX5JL4rnDpnl2EiF7+U4IGb5qHpmScoe/CBysITHBUxfPdlYJVNN7MY6pm5Z7CVvygJfS3KvYFBRcmccErFs/A==
+
 react-native-wifi-reborn@^4.8.3:
   version "4.8.3"
   resolved "https://registry.npmjs.org/react-native-wifi-reborn/-/react-native-wifi-reborn-4.8.3.tgz"

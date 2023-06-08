@@ -1,121 +1,45 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  KeyboardAvoidingView,
-  TouchableOpacity,
-} from 'react-native';
-import React from 'react';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import React, { useRef, useState } from 'react';
+import { View, TextInput, Button } from 'react-native';
 
 const App = () => {
-  return (
-    <KeyboardAwareScrollView
-      enableAutomaticScroll={true}
-      extraScrollHeight={100}
-      scrollEnabled={true}
-      enableOnAndroid={true}>
-      <ScrollView>
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            margin: 20,
-            padding: 10,
-          }}
-          autoFocus={true}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            margin: 20,
-            padding: 10,
-            marginVertical: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            margin: 20,
-            marginVertical: 10,
-            padding: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            marginVertical: 10,
-            margin: 20,
-            padding: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            margin: 20,
-            marginVertical: 10,
-            padding: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            marginVertical: 10,
-            margin: 20,
-            padding: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            marginVertical: 10,
-            margin: 20,
-            padding: 10,
-          }}
-        />
-        <TextInput
-          placeholder="Enter your name"
-          style={{
-            borderWidth: 1,
-            borderColor: 'black',
-            marginVertical: 10,
-            margin: 20,
-            padding: 10,
-          }}
-        />
+  const inputRefs = [useRef(), useRef(), useRef()]; // Refs for each input field
+  const [currentInputIndex, setCurrentInputIndex] = useState(0);
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: 'blue',
-            padding: 10,
-            margin: 20,
-            alignItems: 'center',
-            marginVertical: 10,
-            borderRadius: 10,
-          }}>
-          <Text
-            style={{
-              color: 'white',
-            }}>
-            Submit
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAwareScrollView>
+  const focusNextInput = () => {
+    const nextIndex = currentInputIndex + 1;
+    if (nextIndex < inputRefs.length) {
+      inputRefs[nextIndex].current.focus();
+      setCurrentInputIndex(nextIndex);
+    }
+  };
+
+  const handleSubmit = () => {
+    // Handle form submission
+    focusNextInput();
+  };
+
+  return (
+    <View>
+      <TextInput
+        ref={inputRefs[0]}
+        placeholder="First input"
+        onSubmitEditing={focusNextInput}
+        returnKeyType="next"
+      />
+      <TextInput
+        ref={inputRefs[1]}
+        placeholder="Second input"
+        onSubmitEditing={focusNextInput}
+        returnKeyType="next"
+      />
+      <TextInput
+        ref={inputRefs[2]}
+        placeholder="Third input"
+        onSubmitEditing={handleSubmit}
+        returnKeyType="done"
+      />
+      <Button title="Submit" onPress={handleSubmit} />
+    </View>
   );
 };
 

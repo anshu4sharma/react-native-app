@@ -119,9 +119,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     fontWeight: 'bold',
+    color: 'black',
   },
   textStyle: {
     fontSize: 16,
+    color: 'black',
     marginVertical: 10,
   },
 });
